@@ -1,10 +1,16 @@
 // Require the necessary discord.js classes
+require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent, ], 
+	});
 
 client.commands = new Collection();
 
@@ -32,6 +38,28 @@ for (const folder of commandFolders) {
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
+
+
+client.on('messageCreate', async message => {
+
+    //Ignore messages from bots or those that do not start with !
+    if ((message.author.bot) || !message.content.startsWith('!')) return;
+
+    const args = message.content.slice(1).trim().split(/ +/);
+    const commandName = args.shift().toLowerCase();
+
+    
+
+    const command = client.commands.get(commandName)
+	if (!command) return
+
+    try {
+        await command.execute(message, args);
+    } catch (error) {
+        console.error(error);
+        message.reply('There was an error with the command.')
+    }
+})
 
 // Log in to Discord with your client's token
 client.login(token);
