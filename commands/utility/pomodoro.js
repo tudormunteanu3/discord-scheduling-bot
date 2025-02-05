@@ -4,7 +4,7 @@ module.exports = {
     data: {
     name: 'pomodoro',
     },
-    description: 'Creates a pomodoro timer. Use: !pomodoro <time in minutes>',
+    description: 'Creates a pomodoro timer. e.g: !pomodoro <time in minutes>',
 
     async execute(message, args) {
         let defaultDuration = 25;

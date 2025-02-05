@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-require('dotenv').config();
+require('dotenv').config(); 
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
@@ -61,5 +61,14 @@ client.on('messageCreate', async message => {
     }
 })
 
+client.on(Events.InteractionCreate, async interaction => {
+	if (!interaction.isButton()) return;
+
+	if (interaction.customId === 'accept') {
+		await interaction.reply({ content: `${interaction.user.username} accepted the event!`, ephemeral: true})
+	}
+})
+
 // Log in to Discord with your client's token
 client.login(token);
+
