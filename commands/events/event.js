@@ -22,9 +22,9 @@ module.exports = {
         const eventDescription = args.join(' ')
 
         const eventEmbed = new EmbedBuilder()
-            .setTitle("Default event title")
+            .setTitle(title)
             .setDescription(eventDescription)
-            .addFields({name: 'Event Date and time', value: eventDate.toLocaleString(), inline:true})
+            .addFields({ name: 'Event Date and time', value: eventDate.toLocaleString(), inline: true })
             .setColor(0x00AE86)
             .setTimestamp();
 
@@ -35,7 +35,17 @@ module.exports = {
 
         const row = new ActionRowBuilder().addComponents(confirmButton)
 
-        const eventMessage = await message.channel.send({ embeds: [eventEmbed], components: [row]})
+        const eventMessage = await message.channel.send({ embeds: [eventEmbed], components: [row] })
+
+        
+        const newEvent = new Event({
+            title: title,
+            description: eventDescription,
+            eventDate: eventDate
+        });
+        const savedEvent = await newEvent.save();
+
+
 
         const scheduler = new Scheduler();
         scheduler.scheduleTask(eventDate, () => {
