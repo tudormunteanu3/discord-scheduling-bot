@@ -1,16 +1,24 @@
 // Require the necessary discord.js classes
-require('dotenv').config(); 
+require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+const token = process.env.DISCORD_TOKEN;
+const connectDB = require('./db');
+const Event = require('./models/events');
+
+
+
+connectDB();
 // Create a new client instance
-const client = new Client({ 
+
+const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.MessageContent, ], 
-	});
+		GatewayIntentBits.MessageContent,],
+});
+
 
 client.commands = new Collection();
 
@@ -42,30 +50,46 @@ client.once(Events.ClientReady, readyClient => {
 
 client.on('messageCreate', async message => {
 
-    //Ignore messages from bots or those that do not start with !
-    if ((message.author.bot) || !message.content.startsWith('!')) return;
+	//Ignore messages from bots or those that do not start with !
+	if ((message.author.bot) || !message.content.startsWith('!')) return;
 
-    const args = message.content.slice(1).trim().split(/ +/);
-    const commandName = args.shift().toLowerCase();
+	const args = message.content.slice(1).trim().split(/ +/);
+	const commandName = args.shift().toLowerCase();
 
-    
 
-    const command = client.commands.get(commandName)
+
+	const command = client.commands.get(commandName)
 	if (!command) return
 
-    try {
-        await command.execute(message, args);
-    } catch (error) {
-        console.error(error);
-        message.reply('There was an error with the command.')
-    }
+	try {
+		await command.execute(message, args);
+	} catch (error) {
+		console.error(error);
+		message.reply('There was an error with the command.')
+	}
 })
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isButton()) return;
 
-	if (interaction.customId === 'accept') {
-		await interaction.reply({ content: `${interaction.user.username} accepted the event!`, ephemeral: true})
+	if (interaction.customId.startsWith('accept-')) {
+
+		const eventId = interaction.customId.split('-')[1]
+
+		try {
+			const event = await Event.findById(eventId)
+			if(!event) return interaction.reply({content: 'Event does not exist.', ephemeral: true})
+
+			if(!event.participants.includes(interaction.user.username)) {
+				event.participants.push(interaction.user.username)
+				await event.save()
+			}
+			await interaction.reply({ content: `${interaction.user.username} accepted the event!`, ephemeral: true })
+		} catch (error) {
+			console.error(error)
+			await interaction.reply({ content: 'There was an error', ephemeral:true})
+		}
+		
 	}
 })
 

@@ -3,15 +3,12 @@ const mongoose  = require('mongoose')
 const EventSchema = new mongoose.Schema({
     title: {
         type: String,
-        default: 'Default event title'
     },
     description: {
         type: String,
-        required: true,
     },
     eventDate: {
         type: Date,
-        required: true,
     },
     participants: [
         {

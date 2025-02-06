@@ -2,8 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./db');
 const eventRoutes = require('./routes/event.js');
+const cors = require('cors');
+
+
+
 
 const app = express();
+app.use(cors());
 
 connectDB();
 
@@ -15,5 +20,5 @@ app.get('/', (req, res) => {
 	res.send('API is running.');
 })
 
-const PORT = process.env.Port || 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
