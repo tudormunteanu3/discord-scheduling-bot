@@ -1,6 +1,6 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { Scheduler } = require('../../scheduler.js');
-const Event = require('../../models/Event');
+const Event = require('../../models/events');
 
 module.exports = {
     data: {
@@ -18,6 +18,17 @@ module.exports = {
         if (isNaN(eventDate.getTime())) {
             return message.reply("The date format is incorrect, please use the ISO date/time format, e.g: 2025-02-16T12:00:00")
         }
+        if (eventDate< new Date()) {
+            return message.reply("That date has already passed, please pick a future date.")
+        }
+
+        const duplicate = await Event.findOne({
+            title: title,
+            eventDate: eventDate
+        })
+        if(duplicate) {
+            return message.reply("That event already exists.")
+        }
 
         const eventDescription = args.join(' ')
 
@@ -28,8 +39,19 @@ module.exports = {
             .setColor(0x00AE86)
             .setTimestamp();
 
+
+
+
+        const newEvent = new Event({
+            title: title,
+            description: eventDescription,
+            eventDate: eventDate
+        });
+        const savedEvent = await newEvent.save();
+
+
         const confirmButton = new ButtonBuilder()
-            .setCustomId('accept')
+            .setCustomId(`accept-${savedEvent._id}`)
             .setLabel('Accept')
             .setStyle(ButtonStyle.Primary);
 
@@ -37,13 +59,8 @@ module.exports = {
 
         const eventMessage = await message.channel.send({ embeds: [eventEmbed], components: [row] })
 
-        
-        const newEvent = new Event({
-            title: title,
-            description: eventDescription,
-            eventDate: eventDate
-        });
-        const savedEvent = await newEvent.save();
+
+
 
 
 
