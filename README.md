@@ -19,6 +19,9 @@ Then:
 Functionality:
 
 1.The bot has a simple pomodoro timer functionality, in order to use it just type `!pomodoro`. This will start a timer with a default of 25minutes. Otherwise, you can type `!pomodoro X` where X= any number, and it will make a timer for X minutes. E.g: `!pomodoro 5` would start a 5minute timer. At the end of the timer, the user gets pinged that its time for a break.
-2.The !event command creates an event that people can apply to to be notified of that is linked to a react frontend where you can see, edit and delete the current open events. 
+
+2.The !event command creates an event that people can apply to to be notified of that is linked to a react frontend where you can see, edit and delete the current open events.
+
 To run: `!event EventTitle EventDate EventDescription`. The Event Date needs to be in ISO format, so for example: `!event Important Event 2025-02-15T12:00:00 The most important event of all time`.
+
 Then, on the React frontend at `http://localhost:5173/` you can see and interact with the events.
